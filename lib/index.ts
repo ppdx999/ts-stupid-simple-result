@@ -58,24 +58,3 @@ export const wrapPromise = <T, E = Error>(
       (e) =>
         toErr(e instanceof Error ? e : new Error(String(e))) as Result<T, E>
     );
-
-export const parseBasicAuth = (
-  _auth: string
-): Result<string, string, Error> => {
-  const [id, secret] = ["id", "secret"];
-  if (!id || !secret) {
-    return [null, null, new Error("Invalid auth header")];
-  }
-  return [id, secret, null];
-};
-
-export const validateBasicAuthText =
-  (secret: string) =>
-  (text: string): Result<boolean, string, string, Error> => {
-    const [id, authSecret, error] = parseBasicAuth(text);
-    if (error) {
-      return [null, null, null, error];
-    }
-
-    return [authSecret === secret, id, authSecret, null];
-  };
