@@ -58,3 +58,5 @@ export const wrapPromise = <T, E = Error>(
       (e) =>
         toErr(e instanceof Error ? e : new Error(String(e))) as Result<T, E>
     );
+
+export const R = wrapPromise;
