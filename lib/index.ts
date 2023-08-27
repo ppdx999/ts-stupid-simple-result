@@ -15,26 +15,36 @@ type Result9<A, B, C, D, E, F, G, H, I> =
   | [A, B, C, D, F, G, H, I, null]
   | [null, null, null, null, null, null, null, null, E];
 
-// combine all result types into one
+const NothingPassed = Symbol(
+  "github.com/ppdx999/ts-stupid-simple-result:NothingPassed"
+);
+type NothingPassed = typeof NothingPassed;
+
 export type Result<
   A,
   B,
-  C = undefined,
-  D = undefined,
-  E = undefined,
-  F = undefined,
-  G = undefined,
-  H = undefined,
-  I = undefined
-> =
-  | Result2<A, B>
-  | Result3<A, B, C>
-  | Result4<A, B, C, D>
-  | Result5<A, B, C, D, E>
-  | Result6<A, B, C, D, E, F>
-  | Result7<A, B, C, D, E, F, G>
-  | Result8<A, B, C, D, E, F, G, H>
-  | Result9<A, B, C, D, E, F, G, H, I>;
+  C = NothingPassed,
+  D = NothingPassed,
+  E = NothingPassed,
+  F = NothingPassed,
+  G = NothingPassed,
+  H = NothingPassed,
+  I = NothingPassed
+> = C extends NothingPassed
+  ? Result2<A, B>
+  : D extends NothingPassed
+  ? Result3<A, B, C>
+  : E extends NothingPassed
+  ? Result4<A, B, C, D>
+  : F extends NothingPassed
+  ? Result5<A, B, C, D, E>
+  : G extends NothingPassed
+  ? Result6<A, B, C, D, E, F>
+  : H extends NothingPassed
+  ? Result7<A, B, C, D, E, F, G>
+  : I extends NothingPassed
+  ? Result8<A, B, C, D, E, F, G, H>
+  : Result9<A, B, C, D, E, F, G, H, I>;
 
 export const toOk = <T, E = Error>(v: T): Result<T, E> => [v, null];
 export const toErr = <T, E = Error>(e: E): Result<T, E> => [null, e];
@@ -48,3 +58,24 @@ export const wrapPromise = <T, E = Error>(
       (e) =>
         toErr(e instanceof Error ? e : new Error(String(e))) as Result<T, E>
     );
+
+export const parseBasicAuth = (
+  _auth: string
+): Result<string, string, Error> => {
+  const [id, secret] = ["id", "secret"];
+  if (!id || !secret) {
+    return [null, null, new Error("Invalid auth header")];
+  }
+  return [id, secret, null];
+};
+
+export const validateBasicAuthText =
+  (secret: string) =>
+  (text: string): Result<boolean, string, string, Error> => {
+    const [id, authSecret, error] = parseBasicAuth(text);
+    if (error) {
+      return [null, null, null, error];
+    }
+
+    return [authSecret === secret, id, authSecret, null];
+  };
