@@ -13,10 +13,17 @@ const someAsyncFn = async (): Promise<string> => {
 }
 
 // Somewhere else
-import {toResult} from 'stupid-simple-result';
+import {toOk, toErr} from 'stupid-simple-result';
 
 const doSomthing = async () => {
-    const [ok, err] = await someAsyncFn().then(toResult)
+    const [ok, err] = await someAsyncFn().then(toOk).catch(toErr)
+    if (err) { /* Do some error handling */ }
+    console.log(ok) // OK
+}
+
+import {wrapPromise} from 'stupid-simple-result';
+const doAnother = async () => {
+    const [ok, err] = await wrapPromise(someAsyncFn())
     if (err) { /* Do some error handling */ }
     console.log(ok) // OK
 }

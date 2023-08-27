@@ -36,7 +36,15 @@ export type Result<
   | Result8<A, B, C, D, E, F, G, H>
   | Result9<A, B, C, D, E, F, G, H, I>;
 
-export const toResult = <T, E = Error>(p: Promise<T>): Promise<Result<T, E>> =>
+export const toOk = <T, E = Error>(v: T): Result<T, E> => [v, null];
+export const toErr = <T, E = Error>(e: E): Result<T, E> => [null, e];
+
+export const wrapPromise = <T, E = Error>(
+  p: Promise<T>
+): Promise<Result<T, E>> =>
   p
-    .then((v) => [v, null] as Result<T, E>)
-    .catch((e) => [null, e] as Result<T, E>);
+    .then(toOk as (v: T) => Result<T, E>)
+    .catch(
+      (e) =>
+        toErr(e instanceof Error ? e : new Error(String(e))) as Result<T, E>
+    );
