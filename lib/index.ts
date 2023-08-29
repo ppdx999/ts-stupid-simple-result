@@ -49,9 +49,9 @@ export type Result<
 export const toOk = <T, E = Error>(v: T): Result<T, E> => [v, null];
 export const toErr = <T, E = Error>(e: E): Result<T, E> => [null, e];
 
-export const wrapPromise = <T, E = Error>(
-  p: Promise<T>
-): Promise<Result<T, E>> =>
+export type AsyncResult<T, E = Error> = Promise<Result<T, E>>;
+
+export const wrapPromise = <T, E = Error>(p: Promise<T>): AsyncResult<T, E> =>
   p
     .then(toOk as (v: T) => Result<T, E>)
     .catch(
