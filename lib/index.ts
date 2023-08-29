@@ -22,7 +22,7 @@ type NothingPassed = typeof NothingPassed;
 
 export type Result<
   A,
-  B,
+  B = Error,
   C = NothingPassed,
   D = NothingPassed,
   E = NothingPassed,
