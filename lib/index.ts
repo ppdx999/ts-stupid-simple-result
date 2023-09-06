@@ -59,4 +59,29 @@ export const wrapPromise = <T, E = Error>(p: Promise<T>): AsyncResult<T, E> =>
         toErr(e instanceof Error ? e : new Error(String(e))) as Result<T, E>
     );
 
+// just an alias of wrapPromise
 export const R = wrapPromise;
+
+const isOk = <T, E>(r: Result<T, E>): r is [T, null] => r[1] === null;
+
+export const allOk = <T, E = Error>(
+  ...rs: Result<T, E>[]
+): Result<T[], E[]> => {
+  const oks = rs.filter(isOk).map((r) => r[0]);
+  const errs = rs.filter((r) => !isOk(r)).map((r) => r[1]!);
+
+  return errs.length === 0 ? [oks, null] : [null, errs];
+};
+
+export const asyncAllOk = async <T, E = Error>(
+  ...rs: AsyncResult<T, E>[]
+): AsyncResult<T[], E[]> => {
+  const isOk = (r: Result<T, E>): r is [T, null] => r[1] === null;
+
+  const oks = (await Promise.all(rs)).filter(isOk).map((r) => r[0]);
+  const errs = (await Promise.all(rs))
+    .filter((r) => !isOk(r))
+    .map((r) => r[1]!);
+
+  return errs.length === 0 ? [oks, null] : [null, errs];
+};
