@@ -2,6 +2,13 @@
 
 Stupid-Simple Result Type in Typescript
 
+
+# Install
+
+```
+npm i stupid-simple-result
+```
+
 # Usage
 
 ```typescript
